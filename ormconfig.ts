@@ -17,6 +17,7 @@ const dataSource = new DataSource({
   synchronize: false,
   migrationsRun: process.env.RUN_MIGRATION === 'true',
   logging: false,
-  migrations: ['dist/migrations/*.js']
+  migrations: ['dist/migrations/*.js'],
+  timezone: 'z'
 });
 export default dataSource;

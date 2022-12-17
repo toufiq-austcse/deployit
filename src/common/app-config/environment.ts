@@ -16,4 +16,5 @@ export interface EnvironmentVariables {
   DB_HOST: string;
   DB_PORT: number;
   DB_MIGRATE: string;
+  JWT_SECRET:string;
 }

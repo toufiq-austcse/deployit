@@ -1,4 +1,4 @@
-import { Global, Module } from '@nestjs/common';
+import { Global, Logger, Module } from '@nestjs/common';
 import dataSource from 'ormconfig';
 import { DataSource } from 'typeorm';
 
@@ -8,7 +8,14 @@ import { DataSource } from 'typeorm';
     {
       provide: DataSource,
       useFactory: async () => {
-        await dataSource.initialize();
+        try {
+          await dataSource.initialize();
+          Logger.log('Data source initialized');
+          return dataSource;
+        } catch (e) {
+          console.log('err ', e);
+          throw new Error('Error in DB Initialization');
+        }
       }
     }
 

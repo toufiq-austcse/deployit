@@ -10,6 +10,7 @@ export class AppConfigService {
     let port = this.configService.get('PORT', 3000, { infer: true });
     AppConfigService.appConfig = {
       PORT: port,
+      JWT_SECRET: this.configService.get('JWT_SECRET'),
       SWAGGER_SERVER_BASE_URL: this.configService.get('SWAGGER_SERVER_BASE_URL', `http://localhost:${port}`),
       SWAGGER_SERVER_BASE_URL_DESCRIPTION: this.configService.get('SWAGGER_SERVER_BASE_URL_DESCRIPTION', 'Swagger Server Base URL'),
       SWAGGER_TITLE: this.configService.get('SWAGGER_TITLE', 'NEST BOILERPLATE'),
@@ -22,8 +23,8 @@ export class AppConfigService {
       DB_PASSWORD: this.configService.get('DB_PASSWORD', { infer: true }),
       DB_PORT: this.configService.get('DB_PORT', { infer: true }),
       DB_USER: this.configService.get('DB_USER', { infer: true }),
-      SWAGGER_USERNAME: this.configService.get('SWAGGER_USERNAME', 'toufiq'),
-      SWAGGER_PASSWORD: this.configService.get('SWAGGER_PASSWORD', '1010')
+      SWAGGER_USERNAME: this.configService.get('SWAGGER_USERNAME'),
+      SWAGGER_PASSWORD: this.configService.get('SWAGGER_PASSWORD')
 
     };
   }
