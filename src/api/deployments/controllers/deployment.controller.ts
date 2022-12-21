@@ -1,0 +1,64 @@
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+  UseGuards,
+  UseInterceptors
+} from '@nestjs/common';
+import { DeploymentService } from '../services/deployment.service';
+import { ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { DeploymentResDto, ListDeploymentTypeResDto } from '../dto/res/deployment-res.dto';
+import { BaseApiResponse, SwaggerBaseApiResponse } from '@common/dto/base-api-response.dto';
+import { ResponseInterceptor } from '@common/interceptors/response.interceptor';
+import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
+import { CreateDeploymentReqDto } from '../dto/req/deployment-req.dto';
+import { UserInfoDec } from '@common/decorators/user-info.decorator';
+import { User } from '../../auth/entities/user.entity';
+
+@Controller('deployments')
+@ApiTags('Deployment')
+@UseInterceptors(ResponseInterceptor)
+export class DeploymentController {
+  constructor(private deploymentService: DeploymentService) {
+  }
+
+  @Get('type')
+  @ApiOkResponse({ type: SwaggerBaseApiResponse([ListDeploymentTypeResDto], HttpStatus.OK) })
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('auth')
+  async listDeploymentTypes(): Promise<BaseApiResponse<ListDeploymentTypeResDto[]>> {
+    let data = await this.deploymentService.listDeploymentTypes();
+    return {
+      message: null,
+      data
+    };
+  }
+
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('auth')
+  @ApiCreatedResponse({ type: SwaggerBaseApiResponse(DeploymentResDto, HttpStatus.CREATED) })
+  async create(@Body() dto: CreateDeploymentReqDto, @UserInfoDec() user: User): Promise<BaseApiResponse<DeploymentResDto>> {
+    let data = await this.deploymentService.createDeployment(dto, user);
+    return {
+      message: '',
+      data
+    };
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('auth')
+  @ApiCreatedResponse({ type: SwaggerBaseApiResponse(DeploymentResDto, HttpStatus.OK) })
+  async show(@Param('id', ParseIntPipe) id: number, @UserInfoDec() user: User): Promise<BaseApiResponse<DeploymentResDto>> {
+    let data = await this.deploymentService.showDeployment(id, user);
+    return {
+      message: null,
+      data
+    };
+  }
+}
