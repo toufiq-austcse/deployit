@@ -10,11 +10,13 @@ import {
 import { Deployment } from '../entities/deployment.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { getNanoID } from '@common/utils/index';
+import { DEPLOYMENT_STATUS } from '@common/utils/constants';
+import { DeploymentService } from '../services/deployment.service';
 
 @Injectable()
 @EventSubscriber()
 export class DeploymentEntitySubscriber implements EntitySubscriberInterface<Deployment> {
-  constructor(private datasource: DataSource) {
+  constructor(private datasource: DataSource, private deploymentService: DeploymentService) {
     this.datasource.subscribers.push(this);
     Logger.log('Initialized', DeploymentEntitySubscriber.name);
   }
@@ -23,8 +25,16 @@ export class DeploymentEntitySubscriber implements EntitySubscriberInterface<Dep
     return Deployment;
   }
 
-  afterInsert(event: InsertEvent<Deployment>): Promise<any> | void {
-    return undefined;
+  async afterInsert(event: InsertEvent<Deployment>) {
+    if (event.entity.status === DEPLOYMENT_STATUS.QUEUED) {
+      try {
+        await this.deploymentService.sendPullRepositoryJob(event.entity.id);
+      } catch (e) {
+        console.log('error in pull repository job ', e);
+      }
+
+    }
+    return;
   }
 
   afterLoad(entity: Deployment, event?: LoadEvent<Deployment>): Promise<any> | void {

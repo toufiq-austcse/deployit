@@ -10,3 +10,9 @@ export const DEPLOYMENT_STATUS = {
   CANCELLED: 'cancelled',
   FAILED: 'failed'
 };
+
+export const JOB_NAME = {
+  PULL_REPOSITORY: 'pull_repository',
+  BUILD_DOCKER_IMG: 'build_docker_img',
+  RUN_DOCKER_IMG: 'run_docker_img'
+};

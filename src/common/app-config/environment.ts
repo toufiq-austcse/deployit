@@ -1,4 +1,10 @@
 export interface EnvironmentVariables {
+
+  RABBIT_MQ_URL: string;
+  REPOSITORIES_LOCAL_DIR_PATH:string
+  RABBIT_MQ_DEPLOY_IT_JOB_ROUTING_KEY: string;
+  RABBIT_MQ_DEPLOY_IT_JOB_QUEUE: string;
+  RABBIT_MQ_DEPLOY_IT_EXCHANGE: string;
   PORT: number;
 
   SWAGGER_TITLE: string;
@@ -16,5 +22,5 @@ export interface EnvironmentVariables {
   DB_HOST: string;
   DB_PORT: number;
   DB_MIGRATE: string;
-  JWT_SECRET:string;
+  JWT_SECRET: string;
 }

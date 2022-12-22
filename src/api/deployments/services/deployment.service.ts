@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { DeploymentTypeRepository } from '../repositories/deployment-type.repository';
-import { DEPLOYMENT_STATUS, DEPLOYMENT_TYPE_STATUS } from '@common/utils/constants';
+import { DEPLOYMENT_STATUS, DEPLOYMENT_TYPE_STATUS, JOB_NAME } from '@common/utils/constants';
 import { DeploymentResDto, ListDeploymentResDto, ListDeploymentTypeResDto } from '../dto/res/deployment-res.dto';
 import { plainToInstance } from 'class-transformer';
 import { CreateDeploymentReqDto, ListDeploymentQueryDto } from '../dto/req/deployment-req.dto';
@@ -10,10 +10,14 @@ import { Deployment } from '../entities/deployment.entity';
 import { DeploymentRepository } from '../repositories/deployment.repository';
 import { DeploymentType } from '../entities/deployment-type.entity';
 import { GetDeploymentsFilterDto } from '../dto/db-query/get-deployments-filter.dto';
+import { DeploymentJobDto } from '../dto/job';
+import { RabbitMqService } from '@common/rabbit-mq/service/rabbitmq.service';
+import { AppConfigService } from '@common/app-config/service/app-config.service';
 
 @Injectable()
 export class DeploymentService {
-  constructor(private deploymentTypesRepository: DeploymentTypeRepository, private repository: DeploymentRepository) {
+  constructor(private deploymentTypesRepository: DeploymentTypeRepository, private repository: DeploymentRepository,
+              private rabbitMqService: RabbitMqService) {
   }
 
   async listDeploymentTypes(): Promise<ListDeploymentTypeResDto[]> {
@@ -109,5 +113,10 @@ export class DeploymentService {
     });
     return deployments;
 
+  }
+
+  async sendPullRepositoryJob(id: number) {
+    let job: DeploymentJobDto = { name: JOB_NAME.PULL_REPOSITORY, deployment_id: id };
+    this.rabbitMqService.publish(AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_EXCHANGE, AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_JOB_ROUTING_KEY, job);
   }
 }

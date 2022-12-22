@@ -9,10 +9,11 @@ import { EnvironmentVariableRepository } from './repositories/environment-variab
 import { DeploymentController } from './controllers/deployment.controller';
 import { DeploymentService } from './services/deployment.service';
 import { DeploymentEntitySubscriber } from './entity-subscribers/deployment-entity.subscriber';
+import { DeploymentJobHandler } from './job-handlers/deployment-job.handler';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Deployment, DeploymentType, EnvironmentVariable])],
-  providers: [DeploymentRepository, DeploymentTypeRepository, EnvironmentVariableRepository, DeploymentService, DeploymentEntitySubscriber],
+  providers: [DeploymentRepository, DeploymentTypeRepository, EnvironmentVariableRepository, DeploymentService, DeploymentEntitySubscriber, DeploymentJobHandler],
   controllers: [DeploymentController]
 })
 export class DeploymentsModule {

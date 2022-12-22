@@ -4,10 +4,11 @@ import { AppConfigModule } from '@common/app-config/app-config.module';
 import { DatabaseModule } from '@common/database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { DeploymentsModule } from './deployments/deployments.module';
+import { RabbitMQModule } from '@common/rabbit-mq/rabbit-mq.module';
 
 
 @Module({
-  imports: [DatabaseModule, AppConfigModule, IndexModule, AuthModule, DeploymentsModule],
+  imports: [DatabaseModule, RabbitMQModule, AppConfigModule, IndexModule, AuthModule, DeploymentsModule],
   controllers: [],
   providers: []
 })

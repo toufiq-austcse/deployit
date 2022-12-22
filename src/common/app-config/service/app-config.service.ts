@@ -10,6 +10,11 @@ export class AppConfigService {
     let port = this.configService.get('PORT', 3000, { infer: true });
     AppConfigService.appConfig = {
       PORT: port,
+      RABBIT_MQ_DEPLOY_IT_EXCHANGE: this.configService.get('RABBIT_MQ_DEPLOY_IT_EXCHANGE'),
+      REPOSITORIES_LOCAL_DIR_PATH: this.configService.get('REPOSITORIES_LOCAL_DIR_PATH'),
+      RABBIT_MQ_URL: this.configService.get('RABBIT_MQ_URL'),
+      RABBIT_MQ_DEPLOY_IT_JOB_QUEUE: this.configService.get('RABBIT_MQ_DEPLOY_IT_JOB_QUEUE'),
+      RABBIT_MQ_DEPLOY_IT_JOB_ROUTING_KEY: this.configService.get('RABBIT_MQ_DEPLOY_IT_JOB_ROUTING_KEY'),
       JWT_SECRET: this.configService.get('JWT_SECRET'),
       SWAGGER_SERVER_BASE_URL: this.configService.get('SWAGGER_SERVER_BASE_URL', `http://localhost:${port}`),
       SWAGGER_SERVER_BASE_URL_DESCRIPTION: this.configService.get('SWAGGER_SERVER_BASE_URL_DESCRIPTION', 'Swagger Server Base URL'),
