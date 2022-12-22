@@ -30,3 +30,18 @@ export class CreateDeploymentReqDto {
   @IsOptional()
   root_dir: string = null;
 }
+
+export class ListDeploymentQueryDto {
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  page: number = 1;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  limit: number = 20;
+}

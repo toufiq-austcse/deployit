@@ -1,14 +1,15 @@
-import { BadRequestException, Injectable, NotAcceptableException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { DeploymentTypeRepository } from '../repositories/deployment-type.repository';
 import { DEPLOYMENT_STATUS, DEPLOYMENT_TYPE_STATUS } from '@common/utils/constants';
-import { DeploymentResDto, ListDeploymentTypeResDto } from '../dto/res/deployment-res.dto';
+import { DeploymentResDto, ListDeploymentResDto, ListDeploymentTypeResDto } from '../dto/res/deployment-res.dto';
 import { plainToInstance } from 'class-transformer';
-import { CreateDeploymentReqDto } from '../dto/req/deployment-req.dto';
+import { CreateDeploymentReqDto, ListDeploymentQueryDto } from '../dto/req/deployment-req.dto';
 import { User } from '../../auth/entities/user.entity';
-import { DeepPartial } from 'typeorm';
+import { DeepPartial, In } from 'typeorm';
 import { Deployment } from '../entities/deployment.entity';
 import { DeploymentRepository } from '../repositories/deployment.repository';
 import { DeploymentType } from '../entities/deployment-type.entity';
+import { GetDeploymentsFilterDto } from '../dto/db-query/get-deployments-filter.dto';
 
 @Injectable()
 export class DeploymentService {
@@ -65,10 +66,48 @@ export class DeploymentService {
       },
       relations: ['deployment_type']
     });
+    if (!deployment) {
+      throw new NotFoundException('Deployment not found');
+    }
     return plainToInstance(DeploymentResDto, deployment, {
       enableImplicitConversion: true,
       excludeExtraneousValues: true
     });
+
+  }
+
+  async listDeployments(query: ListDeploymentQueryDto, user: User): Promise<ListDeploymentResDto> {
+    let filter = this.buildGetDeploymentsFilter(query, user);
+    let { items, meta } = await this.repository.getDeployments(filter, { page: query.page, limit: query.limit });
+    await this.mapDeploymentType(items);
+    return plainToInstance(ListDeploymentResDto, {
+      items, meta
+    }, { enableImplicitConversion: true, excludeExtraneousValues: true });
+  }
+
+  private buildGetDeploymentsFilter(query: ListDeploymentQueryDto, user?: User): GetDeploymentsFilterDto {
+    let filter: GetDeploymentsFilterDto = Object.create({});
+    if (user) {
+      filter.user_id = user.id;
+    }
+    return filter;
+
+  }
+
+  async mapDeploymentType(deployments: Deployment[]): Promise<Deployment[]> {
+    let deploymentTypeIds = deployments.map(deployment => deployment.deployment_type_id);
+    let deploymentTypes = await this.deploymentTypesRepository.find({
+      where: {
+        id: In(deploymentTypeIds)
+      }
+    });
+    deployments.forEach(deployment => {
+      let deploymentTypeIndex = deploymentTypes.findIndex(deploymentType => deploymentType.id === deployment.deployment_type_id);
+      if (deploymentTypeIndex >= 0) {
+        deployment.deployment_type = deploymentTypes[deploymentTypeIndex];
+      }
+    });
+    return deployments;
 
   }
 }
