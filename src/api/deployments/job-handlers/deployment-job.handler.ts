@@ -137,7 +137,12 @@ export class DeploymentJobHandler {
       let mappedPort = terminalOutput.split('->')[1].trim();
       await this.deploymentRepository.update({
         id: deployment.id
-      }, { container_id: containerId, mapped_port: mappedPort, status: DEPLOYMENT_STATUS.RUNNING });
+      }, {
+        container_id: containerId,
+        mapped_port: mappedPort,
+        status: DEPLOYMENT_STATUS.RUNNING,
+        last_deployed_at: new Date()
+      });
 
     } catch (e) {
       console.log('error in run docker container ', e);
