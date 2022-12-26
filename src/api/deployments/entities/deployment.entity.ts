@@ -36,6 +36,12 @@ export class Deployment extends AppBaseEntity {
   sub_domain_name: string;
 
   @Column({
+    type: 'varchar',
+    nullable: true
+  })
+  mapped_port: string;
+
+  @Column({
     type: 'varchar'
   })
   status: string;

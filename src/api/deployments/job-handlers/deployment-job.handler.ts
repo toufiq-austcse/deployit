@@ -9,10 +9,12 @@ import { DeploymentRepository } from '../repositories/deployment.repository';
 import { AppConfigService } from '@common/app-config/service/app-config.service';
 import { RabbitMqService } from '@common/rabbit-mq/service/rabbitmq.service';
 import { Deployment } from '../entities/deployment.entity';
+import { DeploymentService } from '../services/deployment.service';
+import { terminal } from '@common/utils/terminal';
 
 @Injectable()
 export class DeploymentJobHandler {
-  constructor(private deploymentRepository: DeploymentRepository, private rabbitMqService: RabbitMqService) {
+  constructor(private deploymentRepository: DeploymentRepository, private deploymentService: DeploymentService, private rabbitMqService: RabbitMqService) {
   }
 
   @RabbitSubscribe({
@@ -47,8 +49,13 @@ export class DeploymentJobHandler {
         this.buildDockerImg(deployment);
         break;
       }
-      case JOB_NAME.RUN_DOCKER_IMG: {
-        console.log('RUN docker img');
+      case JOB_NAME.RUN_DOCKER_CONTAINER: {
+        this.runDockerContainer(deployment);
+        break;
+      }
+      case JOB_NAME.COMPLETE_DEPLOYMENT: {
+        this.completeDeployment(deployment);
+        break;
       }
     }
   }
@@ -88,7 +95,8 @@ export class DeploymentJobHandler {
   async buildDockerImg(deployment: Deployment) {
     Logger.log('Building docker img', DeploymentJobHandler.name);
     let deploymentLocalDir = this.getDeploymentLocalCloneDir(deployment);
-    let dockerImgBuild = spawn('docker', ['build', deploymentLocalDir, '-t', 'yo']);
+    let imgTag = this.deploymentService.getDockerImgTag(deployment);
+    let dockerImgBuild = spawn('docker', ['build', deploymentLocalDir, '-t', imgTag]);
     dockerImgBuild.stdout.on('data', (data) => {
       console.log(`stdout: ${data}`);
     });
@@ -100,16 +108,47 @@ export class DeploymentJobHandler {
     dockerImgBuild.on('close', async (code) => {
       console.log(`child process exited with code ${code}`);
       if (code !== 0) {
-        await this.deploymentRepository.update({ id: deployment.id }, { status: DEPLOYMENT_STATUS.FAILED });
+        await this.deploymentRepository.update({ id: deployment.id }, {
+          status: DEPLOYMENT_STATUS.FAILED
+        });
       } else {
         Logger.log('build completed', DeploymentJobHandler.name);
-        // let job: DeploymentJobDto = {
-        //   name: JOB_NAME.BUILD_DOCKER_IMG,
-        //   deployment_id: deployment.id
-        // };
-        // await this.rabbitMqService.publish(AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_EXCHANGE, AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_JOB_ROUTING_KEY, job);
+        await this.deploymentRepository.update({ id: deployment.id }, {
+          docker_img_tag: imgTag
+        });
+        let job: DeploymentJobDto = {
+          name: JOB_NAME.RUN_DOCKER_CONTAINER,
+          deployment_id: deployment.id
+        };
+        await this.rabbitMqService.publish(AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_EXCHANGE, AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_JOB_ROUTING_KEY, job);
       }
 
     });
+  }
+
+  private async runDockerContainer(deployment: Deployment) {
+    Logger.log('Running docker container', DeploymentJobHandler.name);
+    try {
+      let port = 4000;
+      let containerRunCommand = `docker run -p :${port} -d -e PORT=${port} ${deployment.docker_img_tag}`;
+      let containerId = await terminal(containerRunCommand);
+      let dockerPortCommand = `docker port ${containerId}`;
+      let terminalOutput = await terminal(dockerPortCommand);
+      let mappedPort = terminalOutput.split('->')[1].trim();
+      await this.deploymentRepository.update({
+        id: deployment.id
+      }, { container_id: containerId, mapped_port: mappedPort, status: DEPLOYMENT_STATUS.RUNNING });
+
+    } catch (e) {
+      console.log('error in run docker container ', e);
+      await this.deploymentRepository.update({
+        id: deployment.id
+      }, { status: DEPLOYMENT_STATUS.FAILED });
+    }
+
+  }
+
+  private completeDeployment(deployment: Deployment) {
+    Logger.log('Completing Deployment', DeploymentJobHandler.name);
   }
 }

@@ -119,4 +119,8 @@ export class DeploymentService {
     let job: DeploymentJobDto = { name: JOB_NAME.PULL_REPOSITORY, deployment_id: id };
     this.rabbitMqService.publish(AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_EXCHANGE, AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_JOB_ROUTING_KEY, job);
   }
+
+  getDockerImgTag(deployment: Deployment): string {
+    return deployment.sub_domain_name.toLowerCase();
+  }
 }
