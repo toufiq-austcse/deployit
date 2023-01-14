@@ -20,6 +20,7 @@ COPY nest-cli.json \
   ./
 # bring in src from context
 COPY ./src/ ./src/
+COPY ./migrations/ ./migrations/
 RUN yarn
 # RUN yarn lint
 RUN yarn build
@@ -32,6 +33,8 @@ COPY --from=base /app/package.json ./
 COPY --from=dev /app/dist/ ./dist/
 # get the node_modules from the intial cache
 COPY --from=base /app/node_modules/ ./node_modules/
+RUN apk add git
+RUN apk add docker
 # expose application port
 EXPOSE 3000
 # start

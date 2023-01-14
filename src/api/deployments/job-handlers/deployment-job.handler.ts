@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { ConsumeMessage } from 'amqplib';
 import * as process from 'process';
+import * as fs from 'fs';
 import { DeploymentJobDto } from '../dto/job';
 import { DEPLOYMENT_STATUS, JOB_NAME } from '@common/utils/constants';
 import { spawn } from 'child_process';
@@ -53,10 +54,6 @@ export class DeploymentJobHandler {
         this.runDockerContainer(deployment);
         break;
       }
-      case JOB_NAME.COMPLETE_DEPLOYMENT: {
-        this.completeDeployment(deployment);
-        break;
-      }
     }
   }
 
@@ -80,14 +77,15 @@ export class DeploymentJobHandler {
       console.log(`child process exited with code ${code}`);
       if (code !== 0) {
         await this.deploymentRepository.update({ id: deployment.id }, { status: DEPLOYMENT_STATUS.FAILED });
-      } else {
-        Logger.log('Clone completed', DeploymentJobHandler.name);
-        let job: DeploymentJobDto = {
-          name: JOB_NAME.BUILD_DOCKER_IMG,
-          deployment_id: deployment.id
-        };
-        await this.rabbitMqService.publish(AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_EXCHANGE, AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_JOB_ROUTING_KEY, job);
+        return;
       }
+      Logger.log('Clone completed', DeploymentJobHandler.name);
+      let job: DeploymentJobDto = {
+        name: JOB_NAME.BUILD_DOCKER_IMG,
+        deployment_id: deployment.id
+      };
+      await this.rabbitMqService.publish(AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_EXCHANGE, AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_JOB_ROUTING_KEY, job);
+
 
     });
   }
@@ -111,17 +109,21 @@ export class DeploymentJobHandler {
         await this.deploymentRepository.update({ id: deployment.id }, {
           status: DEPLOYMENT_STATUS.FAILED
         });
-      } else {
-        Logger.log('build completed', DeploymentJobHandler.name);
-        await this.deploymentRepository.update({ id: deployment.id }, {
-          docker_img_tag: imgTag
-        });
-        let job: DeploymentJobDto = {
-          name: JOB_NAME.RUN_DOCKER_CONTAINER,
-          deployment_id: deployment.id
-        };
-        await this.rabbitMqService.publish(AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_EXCHANGE, AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_JOB_ROUTING_KEY, job);
+        return;
       }
+      Logger.log('build completed', DeploymentJobHandler.name);
+      await this.deploymentRepository.update({ id: deployment.id }, {
+        docker_img_tag: imgTag
+      });
+      let cloneDir = this.getDeploymentLocalCloneDir(deployment);
+      fs.rmSync(cloneDir, { force: true, recursive: true });
+      Logger.log('Repository deleted', DeploymentJobHandler.name);
+      let job: DeploymentJobDto = {
+        name: JOB_NAME.RUN_DOCKER_CONTAINER,
+        deployment_id: deployment.id
+      };
+      await this.rabbitMqService.publish(AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_EXCHANGE, AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_JOB_ROUTING_KEY, job);
+
 
     });
   }
@@ -151,9 +153,5 @@ export class DeploymentJobHandler {
       }, { status: DEPLOYMENT_STATUS.FAILED });
     }
 
-  }
-
-  private completeDeployment(deployment: Deployment) {
-    Logger.log('Completing Deployment', DeploymentJobHandler.name);
   }
 }

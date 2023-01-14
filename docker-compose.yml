@@ -1,13 +1,16 @@
 version: "3"
 services:
-  nest-boilerplate:
-    build: .
-    hostname: nest-boilerplate
-    image: nest-boilerplate
-    container_name: nest-boilerplate
+  deploy-it:
+    build:
+        context: .
+        dockerfile: Dockerfile
+        args:
+          uid: 501
+    hostname: deploy-it
+    container_name: deploy-it
     restart: unless-stopped
     env_file: .env
-    environment:
-      - PORT=$PORT
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - $PORT:$PORT
