@@ -2,6 +2,20 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Expose, plainToInstance, Transform } from 'class-transformer';
 import { PaginationResMeta } from '@common/dto/pagination-meta-res.dto';
 
+export class EnvironmentVariableResDto {
+  @ApiProperty()
+  @Expose()
+  id: string;
+
+  @ApiProperty()
+  @Expose()
+  key: string;
+
+  @ApiProperty()
+  @Expose()
+  value: string;
+}
+
 export class ListDeploymentTypeResDto {
   @ApiProperty()
   @Expose()
@@ -63,6 +77,16 @@ export class DeploymentResDto {
   @ApiProperty()
   @Expose()
   root_dir: string;
+
+  @ApiProperty({
+    type: [EnvironmentVariableResDto]
+  })
+  @Expose()
+  @Transform((value) => plainToInstance(EnvironmentVariableResDto, value.obj.environmentVariables, {
+    enableImplicitConversion: true,
+    excludeExtraneousValues: true
+  }))
+  environment_variables: EnvironmentVariableResDto[];
 }
 
 
@@ -82,3 +106,4 @@ export class ListDeploymentResDto {
   @Transform(val => val.obj.meta)
   pagination_meta: PaginationResMeta;
 }
+

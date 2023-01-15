@@ -8,12 +8,15 @@ export const DEPLOYMENT_STATUS = {
   BUILDING: 'building',
   RUNNING: 'running',
   CANCELLED: 'cancelled',
-  FAILED: 'failed'
+  FAILED: 'failed',
+  RESTARTING: 'restarting',
+  STOPPED: 'stopped',
 };
 
 export const JOB_NAME = {
   PULL_REPOSITORY: 'pull_repository',
   BUILD_DOCKER_IMG: 'build_docker_img',
   RUN_DOCKER_CONTAINER: 'run_docker_container',
-  COMPLETE_DEPLOYMENT: 'complete_deployment'
+  COMPLETE_DEPLOYMENT: 'complete_deployment',
+  RESTART_DOCKER_CONTAINER: 'restart_docker_container'
 };

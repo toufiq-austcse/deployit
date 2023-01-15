@@ -1,4 +1,5 @@
 import { DataSource } from 'typeorm';
+import * as process from 'process';
 
 console.log(' process.env.ENV_PATH ', process.env.ENV_PATH);
 require('dotenv').config({
@@ -16,7 +17,7 @@ const dataSource = new DataSource({
   entities: ['dist/**/*.entity{.ts,.js}'],
   synchronize: false,
   migrationsRun: process.env.RUN_MIGRATION === 'true',
-  logging: false,
+  logging: process.env.DB_LOG_ENABLED === 'true',
   migrations: ['dist/migrations/*.js'],
   timezone: 'z'
 });

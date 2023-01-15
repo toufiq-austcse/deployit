@@ -12,10 +12,16 @@ import { RabbitMqService } from '@common/rabbit-mq/service/rabbitmq.service';
 import { Deployment } from '../entities/deployment.entity';
 import { DeploymentService } from '../services/deployment.service';
 import { terminal } from '@common/utils/terminal';
+import { EnvironmentVariableService } from '../services/env-variable.service';
+import { DockerService } from '../services/docker.service';
 
 @Injectable()
 export class DeploymentJobHandler {
-  constructor(private deploymentRepository: DeploymentRepository, private deploymentService: DeploymentService, private rabbitMqService: RabbitMqService) {
+  constructor(private deploymentRepository: DeploymentRepository,
+              private deploymentService: DeploymentService,
+              private environmentVariableService: EnvironmentVariableService,
+              private rabbitMqService: RabbitMqService,
+              private dockerService: DockerService) {
   }
 
   @RabbitSubscribe({
@@ -52,6 +58,10 @@ export class DeploymentJobHandler {
       }
       case JOB_NAME.RUN_DOCKER_CONTAINER: {
         this.runDockerContainer(deployment);
+        break;
+      }
+      case JOB_NAME.RESTART_DOCKER_CONTAINER: {
+        this.restartDockerContainer(deployment);
         break;
       }
     }
@@ -131,10 +141,12 @@ export class DeploymentJobHandler {
   private async runDockerContainer(deployment: Deployment) {
     Logger.log('Running docker container', DeploymentJobHandler.name);
     try {
-      let port = 4000;
-      let containerRunCommand = `docker run -p :${port} -d -e PORT=${port} ${deployment.docker_img_tag}`;
+
+      let envVariables = await this.environmentVariableService.getEnvVariables(deployment.id);
+      let envVariableCommandString = this.dockerService.getEnvVariablesCommandString(envVariables);
+      let containerRunCommand = this.dockerService.getContainerRunCommandString(deployment.docker_img_tag, envVariableCommandString);
       let containerId = await terminal(containerRunCommand);
-      let dockerPortCommand = `docker port ${containerId}`;
+      let dockerPortCommand = this.dockerService.getPortCommand(containerId);
       let terminalOutput = await terminal(dockerPortCommand);
       let mappedPort = terminalOutput.split('->')[1].trim();
       await this.deploymentRepository.update({
@@ -153,5 +165,25 @@ export class DeploymentJobHandler {
       }, { status: DEPLOYMENT_STATUS.FAILED });
     }
 
+  }
+
+  private async restartDockerContainer(deployment: Deployment) {
+    Logger.log('Restarting docker container', DeploymentJobHandler.name);
+    try {
+      await this.deploymentRepository.update({ id: deployment.id }, { status: DEPLOYMENT_STATUS.RESTARTING });
+      let dockerStopCommand = this.dockerService.getContainerStopCommand(deployment.container_id);
+      await terminal(dockerStopCommand);
+      let job: DeploymentJobDto = {
+        name: JOB_NAME.RUN_DOCKER_CONTAINER,
+        deployment_id: deployment.id
+      };
+      await this.rabbitMqService.publish(AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_EXCHANGE, AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_JOB_ROUTING_KEY, job);
+
+    } catch (e) {
+      console.log('error in run docker container ', e);
+      await this.deploymentRepository.update({
+        id: deployment.id
+      }, { status: DEPLOYMENT_STATUS.STOPPED });
+    }
   }
 }

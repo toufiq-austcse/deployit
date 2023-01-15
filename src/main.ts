@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ApiModule } from './api/api.module';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, RequestMethod, ValidationPipe, VersioningType } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/filters/http-exception.filter';
 import morgan from 'morgan';
 import { setupSwagger } from '@common/swagger/index';
@@ -9,6 +9,9 @@ import { setupSwagger } from '@common/swagger/index';
 async function bootstrap() {
   const app = await NestFactory.create(ApiModule);
   let PORT = +process.env.PORT || 3000;
+  app.setGlobalPrefix('api', { exclude: [{ path: '', method: RequestMethod.GET }] });
+  app.enableVersioning({ type: VersioningType.URI });
+
   await setupSwagger(app, PORT);
   app.enableCors();
   app.useGlobalFilters(new HttpExceptionFilter());
