@@ -9,23 +9,7 @@ A simple Render (https://render.com/) type service where users can deploy their 
 - Docker : To build and run the deployment images
 ## Run Locally
 
-Clone the project
-
-```bash
-  git clone https://github.com/toufiq-austcse/deployit.git
-```
-
-Go to the project directory
-
-```bash
-  cd deployit
-```
-
-Execute
-
-```bash
-  docker compose up -d
-```
+In progress...
 
 
 ## API Reference

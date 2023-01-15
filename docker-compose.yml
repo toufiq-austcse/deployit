@@ -1,15 +1,42 @@
 version: "3"
 services:
+  db:
+    image: postgres
+    container_name: local_pgdb
+    restart: always
+    ports:
+      - "54320:5432"
+    environment:
+      POSTGRES_DB: deployit_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - .local_pgdata:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - .pgadmin-data:/var/lib/pgadmin
   deploy-it:
     build:
-        context: .
-        dockerfile: Dockerfile
-        args:
-          uid: 501
+      context: .
+      dockerfile: Dockerfile
+      args:
+        uid: 501
     hostname: deploy-it
     container_name: deploy-it
     restart: unless-stopped
     env_file: .env
+    depends_on:
+      - db
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
