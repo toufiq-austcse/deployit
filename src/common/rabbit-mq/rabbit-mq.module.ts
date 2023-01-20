@@ -13,11 +13,16 @@ import { AppConfigService } from '@common/app-config/service/app-config.service'
         return {
           uri: AppConfigService.appConfig.RABBIT_MQ_URL,
           connectionInitOptions: { wait: false },
+          exchanges: [{
+            name: AppConfigService.appConfig.RABBIT_MQ_DEPLOY_IT_EXCHANGE,
+            type: 'topic'
+          }]
         };
-      },
-    }),
+      }
+    })
   ],
   providers: [RabbitMqService],
-  exports: [RabbitMqService],
+  exports: [RabbitMqService]
 })
-export class RabbitMQModule {}
+export class RabbitMQModule {
+}

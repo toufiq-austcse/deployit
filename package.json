@@ -21,11 +21,11 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prepare": "npx husky install",
     "typeorm": "ts-node ./node_modules/typeorm/cli",
-    "migration:generate": "ENV_PATH='.env' npm run typeorm -- -d ./ormconfig.ts migration:generate ./migrations/$npm_config_name",
-    "db:migrate": "ENV_PATH='.env' npm run typeorm migration:run -- -d ./ormconfig.ts",
-    "db:revert": "ENV_PATH='.env' npm run typeorm -- -d ./ormconfig.ts migration:revert",
-    "db:sync": "ENV_PATH='.env' npm run typeorm -- -d ./typeOrm.config.ts schema:sync",
-    "db:log-sync": "ENV_PATH='.env' npm run typeorm -- -d ./typeOrm.config.ts schema:log"
+    "migration:generate": "ENV_PATH='.env' npm run typeorm -- -d ./dist/ormconfig.js migration:generate ./migrations/$npm_config_name",
+    "db:migrate": "ENV_PATH='.env' npm run typeorm migration:run -- -d ./dist/ormconfig.js",
+    "db:revert": "ENV_PATH='.env' npm run typeorm -- -d ./dist/ormconfig.js migration:revert",
+    "db:sync": "ENV_PATH='.env' npm run typeorm -- -d ./dist/ormconfig.js schema:sync",
+    "db:log-sync": "ENV_PATH='.env' npm run typeorm -- -d ./dist/ormconfig.js schema:log"
   },
   "dependencies": {
     "@golevelup/nestjs-rabbitmq": "^3.3.0",

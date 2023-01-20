@@ -5,7 +5,7 @@ services:
     container_name: local_pgdb
     restart: always
     ports:
-      - "54320:5432"
+      - "5432:5432"
     environment:
       POSTGRES_DB: deployit_db
       POSTGRES_USER: user
@@ -25,6 +25,21 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     volumes:
       - .pgadmin-data:/var/lib/pgadmin
+  rabbit-mq:
+    image: rabbitmq:3-management
+    container_name: 'rabbitmq'
+    restart: unless-stopped
+    volumes:
+      - .rabbitmq:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 10
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
   deploy-it:
     build:
       context: .
@@ -34,9 +49,25 @@ services:
     hostname: deploy-it
     container_name: deploy-it
     restart: unless-stopped
-    env_file: .env
+    environment:
+      PORT: 3000
+      JWT_SECRET: R5BACzmjYf
+      DB_DRIVER: postgres
+      DB_USER: user
+      DB_PASSWORD: admin
+      DB_NAME: deployit_db
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_MIGRATE: false
+      DB_LOG_ENABLED: true
+      RABBIT_MQ_URL: amqp://guest:guest@rabbit-mq:5672
+      RABBIT_MQ_DEPLOY_IT_EXCHANGE: deployIt_exchange
+      RABBIT_MQ_DEPLOY_IT_JOB_ROUTING_KEY: deployit.jobs
+      RABBIT_MQ_DEPLOY_IT_JOB_QUEUE: deployit_job_queue
+      REPOSITORIES_LOCAL_DIR_PATH: /repositories
     depends_on:
       - db
+      - rabbit-mq
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
