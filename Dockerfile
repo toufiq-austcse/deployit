@@ -27,6 +27,7 @@ RUN yarn build
 
 # use one of the smallest images possible
 FROM node:16-alpine
+RUN npm install -g typeorm
 # get package.json from base
 COPY --from=base /app/package.json ./
 # get the dist back
