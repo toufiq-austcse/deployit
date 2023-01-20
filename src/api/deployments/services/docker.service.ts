@@ -7,10 +7,10 @@ export class DockerService {
 
 
   getEnvVariablesCommandString(envVariables: EnvironmentVariable[]): string {
-    let command = '';
+    let command = ` -e PORT=${this.PORT}`;
     for (let envVariable of envVariables) {
       if (envVariable.key === 'PORT') {
-        envVariable.value = this.PORT.toString();
+        continue;
       }
       command += ` -e ${envVariable.key}=${envVariable.value}`;
     }
