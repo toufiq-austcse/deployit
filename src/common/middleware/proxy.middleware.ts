@@ -14,7 +14,10 @@ export class ProxyMiddleware implements NestMiddleware {
       next();
     } else {
       console.log(req.originalUrl, req.baseUrl, req.url);
-      proxy.web(req, res, { target: `http://localhost:3001/${req.originalUrl}` });
+      proxy.web(req, res, { target: `http://localhost:3001/${req.originalUrl}` }, err => {
+        console.log('Proxy error: ', err);
+        next();
+      });
     }
 
 
