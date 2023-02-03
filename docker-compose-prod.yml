@@ -5,6 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     hostname: deploy-it
+    network_mode: "host"
     container_name: deploy-it
     restart: unless-stopped
     env_file:
