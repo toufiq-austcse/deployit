@@ -13,13 +13,15 @@ import { DeploymentJobHandler } from './job-handlers/deployment-job.handler';
 import { EnvironmentVariableService } from './services/env-variable.service';
 import { EnvironmentVariableEntitySubscriber } from './entity-subscribers/environment-variable-entity.subscriber';
 import { DockerService } from './services/docker.service';
+import { ProxyService } from './services/proxy.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Deployment, DeploymentType, EnvironmentVariable])],
   providers: [DeploymentRepository, DeploymentTypeRepository, EnvironmentVariableRepository, DeploymentService,
     EnvironmentVariableService, DeploymentEntitySubscriber, EnvironmentVariableEntitySubscriber, DeploymentJobHandler,
-    DockerService],
-  controllers: [DeploymentController]
+    DockerService, ProxyService],
+  controllers: [DeploymentController],
+  exports: [DeploymentService, ProxyService]
 })
 export class DeploymentsModule {
 }

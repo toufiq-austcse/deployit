@@ -71,7 +71,7 @@ export class DeploymentEntitySubscriber implements EntitySubscriberInterface<Dep
 
   async beforeInsert(event: InsertEvent<Deployment>): Promise<void> {
     Logger.log('Before Insert called');
-    let shortId = await getNanoID(7);
+    let shortId = (await getNanoID(7)).toLowerCase();
     if (!event.entity.short_id) {
       event.entity.short_id = shortId;
     }

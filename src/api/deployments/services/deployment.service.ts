@@ -159,6 +159,13 @@ export class DeploymentService {
         user_id: userId
       }
     });
+  }
 
+  async getDeploymentBySubDomain(subDomainName: string): Promise<Deployment> {
+    return await this.repository.findOne({
+      where: {
+        sub_domain_name: subDomainName
+      }
+    });
   }
 }
