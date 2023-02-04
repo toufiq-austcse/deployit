@@ -14,9 +14,8 @@ export class ProxyService {
   }
 
   async proxyToDeployment(req: Request, res: Response, mappedPort: string) {
-    let port= mappedPort.split(':')[1];
     return new Promise((resolve, reject) => {
-      proxy.web(req, res, { target: `http://localhost:${port}` }, (err, message) => {
+      proxy.web(req, res, { target: `http://localhost:${mappedPort}` }, (err, message) => {
         if (err) {
           return reject(err);
         }
