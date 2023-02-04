@@ -76,7 +76,7 @@ export class DeploymentEntitySubscriber implements EntitySubscriberInterface<Dep
       event.entity.short_id = shortId;
     }
     if (!event.entity.sub_domain_name) {
-      event.entity.sub_domain_name = `${event.entity.name}-${shortId}`;
+      event.entity.sub_domain_name = `${event.entity.name}-${shortId}`.toLowerCase();
     }
     return;
   }
