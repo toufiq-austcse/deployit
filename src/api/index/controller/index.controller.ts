@@ -4,11 +4,13 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('Index')
 @Controller()
 export class IndexController {
+  constructor() {
+  }
 
   @Get()
   index() {
-    return {
-      app: 'DeployIt is running.....'
-    };
+    console.log('api index');
+    //return this.indexService.redirectToService(req, res);
+    return 'DeployIt is running...';
   }
 }

@@ -146,9 +146,7 @@ export class DeploymentJobHandler {
       let envVariableCommandString = this.dockerService.getEnvVariablesCommandString(envVariables);
       let containerRunCommand = this.dockerService.getContainerRunCommandString(deployment.docker_img_tag, envVariableCommandString);
       let containerId = await terminal(containerRunCommand);
-      let dockerPortCommand = this.dockerService.getPortCommand(containerId);
-      let terminalOutput = await terminal(dockerPortCommand);
-      let mappedPort = terminalOutput.split('->')[1].trim();
+      let mappedPort = await this.dockerService.getMappedPort(containerId);
       await this.deploymentRepository.update({
         id: deployment.id
       }, {

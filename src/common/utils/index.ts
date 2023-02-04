@@ -22,7 +22,7 @@ export function checkPassword(hashedPassword: string, plainPassword: string): Pr
 }
 
 export async function getNanoID(len: number): Promise<string> {
-  const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', len);
+  const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', len);
   return nanoid();
 }
 

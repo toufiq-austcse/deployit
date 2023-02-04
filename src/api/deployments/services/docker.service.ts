@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EnvironmentVariable } from '../entities/environment-variable.entity';
+import { terminal } from '@common/utils/terminal';
 
 @Injectable()
 export class DockerService {
@@ -27,5 +28,21 @@ export class DockerService {
 
   getContainerStopCommand(container_id: string): string {
     return `docker stop ${container_id}`;
+  }
+
+  async getMappedPort(containerId: string): Promise<string> {
+    let dockerPortCommand = this.getPortCommand(containerId);
+    let terminalOutput = await terminal(dockerPortCommand);
+    let lines = terminalOutput.split('\n');
+    for (let line of lines) {
+      let parts = line.split('->');
+      for (let part of parts) {
+        part = part.trim();
+        if (part.startsWith('0.0.0.0')) {
+          return part.split(':')[1].trim();
+        }
+      }
+    }
+    return null;
   }
 }
