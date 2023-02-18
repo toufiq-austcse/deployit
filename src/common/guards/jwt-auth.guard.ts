@@ -7,6 +7,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
   canActivate(context: ExecutionContext) {
     let req = context.switchToHttp().getRequest<Request>();
+    let authorization = req.headers.authorization;
+    if (!authorization) {
+      return false;
+    }
     if (!req.headers.authorization.startsWith('Bearer ')) {
       req.headers.authorization = `Bearer ${req.headers.authorization}`;
     }
