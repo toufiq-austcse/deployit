@@ -5,7 +5,7 @@ import { AppConfigService } from '@common/app-config/service/app-config.service'
 
 export async function setupSwagger(app: INestApplication, port: number) {
 
-  let swaggerDocPath = '/doc';
+  let swaggerDocPath = '/api-doc';
 
   const config = new DocumentBuilder()
     .setTitle(AppConfigService.appConfig.SWAGGER_TITLE)
