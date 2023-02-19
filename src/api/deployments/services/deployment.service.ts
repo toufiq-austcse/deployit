@@ -78,6 +78,15 @@ export class DeploymentService {
     if (deploymentType.status === DEPLOYMENT_TYPE_STATUS.DISABLED) {
       throw new NotAcceptableException('This deployment type is currently disabled');
     }
+    let oldDeployment = await this.repository.findOne({
+      where: {
+        name: dto.name,
+        user_id: user.id
+      }
+    });
+    if (oldDeployment) {
+      throw new BadRequestException('Deployment with this name already exists');
+    }
     let newDeploymentObj = this.createDeploymentObjFromCreateReqDto(dto, deploymentType, user);
     let {
       deployment,
