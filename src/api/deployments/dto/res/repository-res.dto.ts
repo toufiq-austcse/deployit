@@ -5,4 +5,9 @@ export class ValidateRepositoryResDto {
   @ApiProperty()
   @Expose()
   is_valid: boolean;
+
+  @ApiProperty()
+  @Expose()
+  repo_name_with_owner: string;
+
 }
