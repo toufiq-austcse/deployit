@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, plainToInstance, Transform } from 'class-transformer';
 import { PaginationResMeta } from '@common/dto/pagination-meta-res.dto';
+import { getServiceUrl } from '@common/utils/index';
 
 export class EnvironmentVariableResDto {
   @ApiProperty()
@@ -57,6 +58,11 @@ export class DeploymentResDto {
   @ApiProperty()
   @Expose()
   sub_domain_name: string;
+
+  @ApiProperty()
+  @Expose()
+  @Transform(val => getServiceUrl(val.obj.sub_domain_name))
+  service_url: string;
 
   @ApiProperty()
   @Expose()

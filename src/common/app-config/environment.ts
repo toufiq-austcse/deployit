@@ -1,7 +1,8 @@
 export interface EnvironmentVariables {
 
   RABBIT_MQ_URL: string;
-  REPOSITORIES_LOCAL_DIR_PATH:string
+  DOMAIN_NAME: string;
+  REPOSITORIES_LOCAL_DIR_PATH: string;
   RABBIT_MQ_DEPLOY_IT_JOB_ROUTING_KEY: string;
   RABBIT_MQ_DEPLOY_IT_JOB_QUEUE: string;
   RABBIT_MQ_DEPLOY_IT_EXCHANGE: string;

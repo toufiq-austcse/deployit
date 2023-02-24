@@ -10,6 +10,7 @@ export class AppConfigService {
     let port = this.configService.get('PORT', 3000, { infer: true });
     AppConfigService.appConfig = {
       PORT: port,
+      DOMAIN_NAME: this.configService.get('DOMAIN_NAME','toufiq.live'),
       RABBIT_MQ_DEPLOY_IT_EXCHANGE: this.configService.get('RABBIT_MQ_DEPLOY_IT_EXCHANGE'),
       REPOSITORIES_LOCAL_DIR_PATH: this.configService.get('REPOSITORIES_LOCAL_DIR_PATH'),
       RABBIT_MQ_URL: this.configService.get('RABBIT_MQ_URL'),
