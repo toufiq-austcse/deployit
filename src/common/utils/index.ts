@@ -2,6 +2,7 @@ import * as bcrypt from 'bcryptjs';
 import { customAlphabet } from 'nanoid/async';
 import { EnvironmentVariableReqDto } from '../../api/deployments/dto/req/deployment-req.dto';
 import { TransformFnParams } from 'class-transformer';
+import { AppConfigService } from '@common/app-config/service/app-config.service';
 
 
 export function concatObject(obj: Object, separator: string = ', ') {
@@ -24,6 +25,10 @@ export function checkPassword(hashedPassword: string, plainPassword: string): Pr
 export async function getNanoID(len: number): Promise<string> {
   const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', len);
   return nanoid();
+}
+
+export function getServiceUrl(subDomainName: string): string {
+  return `https://${subDomainName}.${AppConfigService.appConfig.DOMAIN_NAME}`;
 }
 
 export function sanitizeEnvVariable(obj: TransformFnParams): EnvironmentVariableReqDto[] {
