@@ -52,6 +52,11 @@ export class Deployment extends AppBaseEntity {
   last_deployed_at: Date;
 
   @Column({
+    nullable: true
+  })
+  repository_full_name: string;
+
+  @Column({
     type: 'text'
   })
   repository_link: string;

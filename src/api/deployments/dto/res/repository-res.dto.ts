@@ -8,6 +8,6 @@ export class ValidateRepositoryResDto {
 
   @ApiProperty()
   @Expose()
-  repo_name_with_owner: string;
+  repo_full_name: string;
 
 }

@@ -16,10 +16,9 @@ import { DockerService } from './services/docker.service';
 import { ProxyService } from './services/proxy.service';
 import { RepositoryController } from './controllers/repository.controller';
 import { RepositoryService } from './services/repository.service';
-import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [HttpModule, TypeOrmModule.forFeature([Deployment, DeploymentType, EnvironmentVariable])],
+  imports: [TypeOrmModule.forFeature([Deployment, DeploymentType, EnvironmentVariable])],
   providers: [DeploymentRepository, DeploymentTypeRepository, EnvironmentVariableRepository, DeploymentService,
     EnvironmentVariableService, DeploymentEntitySubscriber, EnvironmentVariableEntitySubscriber, DeploymentJobHandler,
     DockerService, ProxyService, RepositoryService],

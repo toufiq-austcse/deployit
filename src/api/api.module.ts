@@ -6,10 +6,11 @@ import { AuthModule } from './auth/auth.module';
 import { DeploymentsModule } from './deployments/deployments.module';
 import { RabbitMQModule } from '@common/rabbit-mq/rabbit-mq.module';
 import { ProxyMiddleware } from '../common/middleware/proxy.middleware';
+import { HttpClientsModule } from '@common/http-clients/http-clients.module';
 
 
 @Module({
-  imports: [DatabaseModule, RabbitMQModule, AppConfigModule, IndexModule, AuthModule, DeploymentsModule],
+  imports: [DatabaseModule, RabbitMQModule, AppConfigModule, HttpClientsModule, IndexModule, AuthModule, DeploymentsModule],
   controllers: [],
   providers: []
 })

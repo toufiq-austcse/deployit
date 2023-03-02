@@ -10,7 +10,7 @@ export class AppConfigService {
     let port = this.configService.get('PORT', 3000, { infer: true });
     AppConfigService.appConfig = {
       PORT: port,
-      DOMAIN_NAME: this.configService.get('DOMAIN_NAME','toufiq.live'),
+      DOMAIN_NAME: this.configService.get('DOMAIN_NAME', 'toufiq.live'),
       RABBIT_MQ_DEPLOY_IT_EXCHANGE: this.configService.get('RABBIT_MQ_DEPLOY_IT_EXCHANGE'),
       REPOSITORIES_LOCAL_DIR_PATH: this.configService.get('REPOSITORIES_LOCAL_DIR_PATH'),
       RABBIT_MQ_URL: this.configService.get('RABBIT_MQ_URL'),
@@ -30,7 +30,9 @@ export class AppConfigService {
       DB_PORT: this.configService.get('DB_PORT', { infer: true }),
       DB_USER: this.configService.get('DB_USER', { infer: true }),
       SWAGGER_USERNAME: this.configService.get('SWAGGER_USERNAME'),
-      SWAGGER_PASSWORD: this.configService.get('SWAGGER_PASSWORD')
+      SWAGGER_PASSWORD: this.configService.get('SWAGGER_PASSWORD'),
+      GITHUB_API_TOKEN: this.configService.getOrThrow('GITHUB_API_TOKEN'),
+      GITHUB_BASE_URL: this.configService.get('GITHUB_BASE_URL', 'https://api.github.com')
 
     };
   }

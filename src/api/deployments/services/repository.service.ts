@@ -1,28 +1,36 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ValidateRepositoryResDto } from '../dto/res/repository-res.dto';
-import { firstValueFrom } from 'rxjs';
+import { GithubService } from '@common/http-clients/github/services/github.service';
 
 @Injectable()
 export class RepositoryService {
-  constructor(private httpService: HttpService) {
+  constructor(private githubService: GithubService) {
   }
 
-  async validateRepository(url: string): Promise<ValidateRepositoryResDto> {
-    let isValidRepo = false;
-    let repoNameWithOwner = null;
+  parseRepoUrl(repoUrl: string): { repoName: string, repoOwner: string } {
+    return {
+      repoName: repoUrl.split('/').pop().replace('.git', ''),
+      repoOwner: repoUrl.split('/').slice(-2)[0]
+    };
+  }
+
+  async validateRepository(repoUrl: string): Promise<ValidateRepositoryResDto> {
+    let isValid = false;
+    let repoFullName = null;
+    if (!repoUrl.endsWith('.git')) {
+      throw new BadRequestException('Invalid repository url');
+    }
+    let parsedRepoUrl = this.parseRepoUrl(repoUrl);
     try {
-      let res = await firstValueFrom(this.httpService.get(url));
-      if (res.status === HttpStatus.OK) {
-        isValidRepo = true;
-        repoNameWithOwner = url.split('/').slice(-2).join('/');
-      }
+      let repoDetails = await this.githubService.getRepository(parsedRepoUrl.repoOwner, parsedRepoUrl.repoName);
+      isValid = true;
+      repoFullName = repoDetails.full_name;
     } catch (e) {
-      console.log(e);
+      Logger.log(e, 'RepositoryService.validateRepository');
     }
     return {
-      is_valid: isValidRepo,
-      repo_name_with_owner: repoNameWithOwner
+      is_valid: isValid,
+      repo_full_name: repoFullName
     };
   }
 }

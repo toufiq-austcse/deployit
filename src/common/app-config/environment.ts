@@ -24,4 +24,7 @@ export interface EnvironmentVariables {
   DB_PORT: number;
   DB_MIGRATE: string;
   JWT_SECRET: string;
+
+  GITHUB_BASE_URL: string;
+  GITHUB_API_TOKEN: string;
 }
