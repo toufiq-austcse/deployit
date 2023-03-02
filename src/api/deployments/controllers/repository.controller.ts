@@ -18,8 +18,8 @@ export class RepositoryController {
   @ApiOkResponse({ type: SwaggerBaseApiResponse(ValidateRepositoryResDto, HttpStatus.OK) })
   @UseGuards(JwtAuthGuard)
   @ApiSecurity('auth')
-  async validateRepository(@Query('url') url: string): Promise<BaseApiResponse<ValidateRepositoryResDto>> {
-    let data = await this.repositoryService.validateRepository(url);
+  async validateRepository(@Query('repo_url') repoUrl: string): Promise<BaseApiResponse<ValidateRepositoryResDto>> {
+    let data = await this.repositoryService.validateRepository(repoUrl);
     return {
       message: null,
       data
