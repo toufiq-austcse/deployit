@@ -17,10 +17,12 @@ import { EnvironmentVariable } from '../entities/environment-variable.entity';
 import dataSource from '../../../../ormconfig';
 import { GithubService } from '@common/http-clients/github/services/github.service';
 import { RabbitMqService } from '@common/rabbit-mq/service/rabbitmq.service';
+import { EnvironmentVariableRepository } from '../repositories/environment-variable.repository';
 
 @Injectable()
 export class DeploymentService {
   constructor(private deploymentTypesRepository: DeploymentTypeRepository,
+              private envRepository: EnvironmentVariableRepository,
               private repository: DeploymentRepository,
               private githubService: GithubService,
               private rabbitMqService: RabbitMqService) {
@@ -118,7 +120,12 @@ export class DeploymentService {
     if (!deployment) {
       throw new NotFoundException('Deployment not found');
     }
-    return plainToInstance(DeploymentResDto, deployment, {
+    let environmentVariables = await this.envRepository.find({
+      where: {
+        deployment_id: deployment.id
+      }
+    });
+    return plainToInstance(DeploymentResDto, { ...deployment, environmentVariables }, {
       enableImplicitConversion: true,
       excludeExtraneousValues: true
     });
