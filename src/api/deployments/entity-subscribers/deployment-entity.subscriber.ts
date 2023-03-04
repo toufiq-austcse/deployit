@@ -10,7 +10,7 @@ import {
 import { Deployment } from '../entities/deployment.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { getNanoID } from '@common/utils/index';
-import { DEPLOYMENT_STATUS } from '@common/utils/constants';
+import { DEFAULT_BRANCH_NAME, DEPLOYMENT_STATUS } from '@common/utils/constants';
 import { DeploymentService } from '../services/deployment.service';
 
 @Injectable()
@@ -77,6 +77,9 @@ export class DeploymentEntitySubscriber implements EntitySubscriberInterface<Dep
     }
     if (!event.entity.sub_domain_name) {
       event.entity.sub_domain_name = `${event.entity.name}-${shortId}`.toLowerCase();
+    }
+    if (!event.entity.branch_name) {
+      event.entity.branch_name = DEFAULT_BRANCH_NAME;
     }
     return;
   }
