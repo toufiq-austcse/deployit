@@ -13,16 +13,12 @@ import { GetDeploymentsFilterDto } from '../dto/db-query/get-deployments-filter.
 import { DeploymentJobDto } from '../dto/job';
 
 import { AppConfigService } from '@common/app-config/service/app-config.service';
-import { EnvironmentVariable } from '../entities/environment-variable.entity';
-import dataSource from '../../../../ormconfig';
 import { GithubService } from '@common/http-clients/github/services/github.service';
 import { RabbitMqService } from '@common/rabbit-mq/service/rabbitmq.service';
-import { EnvironmentVariableRepository } from '../repositories/environment-variable.repository';
 
 @Injectable()
 export class DeploymentService {
   constructor(private deploymentTypesRepository: DeploymentTypeRepository,
-              private envRepository: EnvironmentVariableRepository,
               private repository: DeploymentRepository,
               private githubService: GithubService,
               private rabbitMqService: RabbitMqService) {
@@ -36,31 +32,8 @@ export class DeploymentService {
     });
   }
 
-  async insertNewDeployment(data: DeepPartial<Deployment>, environmentVariablesData: DeepPartial<EnvironmentVariable[]>):
-    Promise<{ deployment: Deployment, environmentVariables: EnvironmentVariable[] }> {
-    return dataSource.transaction(async transactionalEntityManager => {
-      let deploymentRepository = transactionalEntityManager.getRepository(Deployment);
-      let environmentVariableRepository = transactionalEntityManager.getRepository(EnvironmentVariable);
-
-      let newDeploymentObj = deploymentRepository.create({ ...data });
-      let deployment = await deploymentRepository.save(newDeploymentObj);
-
-      let newEnvironmentVariables: DeepPartial<EnvironmentVariable>[] = [];
-      for (let environmentVariable of environmentVariablesData) {
-        newEnvironmentVariables.push({
-          deployment_id: deployment.id,
-          key: environmentVariable.key,
-          value: environmentVariable.value
-        });
-      }
-      let environmentVariables = await environmentVariableRepository.save(newEnvironmentVariables);
-      return {
-        deployment,
-        environmentVariables
-      };
-
-    });
-
+  async insertNewDeployment(data: DeepPartial<Deployment>): Promise<Deployment> {
+    return this.repository.save(data);
   }
 
   createDeploymentObjFromCreateReqDto(dto: CreateDeploymentReqDto, fullName: string, deploymentType: DeploymentType, user: User): DeepPartial<Deployment> {
@@ -72,7 +45,8 @@ export class DeploymentService {
       repository_url: dto.repository_url,
       branch_name: dto.branch_name,
       user_id: user.id,
-      repository_full_name: fullName
+      repository_full_name: fullName,
+      environment_variables: dto.environment_variables
     };
   }
 
@@ -98,11 +72,8 @@ export class DeploymentService {
       throw new BadRequestException('Invalid repository url');
     }
     let newDeploymentObj = this.createDeploymentObjFromCreateReqDto(dto, repository.full_name, deploymentType, user);
-    let {
-      deployment,
-      environmentVariables
-    } = await this.insertNewDeployment(newDeploymentObj, dto.environment_variables);
-    return plainToInstance(DeploymentResDto, { ...deployment, environmentVariables }, {
+    let deployment = await this.insertNewDeployment(newDeploymentObj);
+    return plainToInstance(DeploymentResDto, deployment, {
       enableImplicitConversion: true,
       excludeExtraneousValues: true
     });
@@ -120,12 +91,8 @@ export class DeploymentService {
     if (!deployment) {
       throw new NotFoundException('Deployment not found');
     }
-    let environmentVariables = await this.envRepository.find({
-      where: {
-        deployment_id: deployment.id
-      }
-    });
-    return plainToInstance(DeploymentResDto, { ...deployment, environmentVariables }, {
+
+    return plainToInstance(DeploymentResDto, deployment, {
       enableImplicitConversion: true,
       excludeExtraneousValues: true
     });

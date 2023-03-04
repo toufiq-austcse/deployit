@@ -3,19 +3,6 @@ import { Expose, plainToInstance, Transform } from 'class-transformer';
 import { PaginationResMeta } from '@common/dto/pagination-meta-res.dto';
 import { getServiceUrl } from '@common/utils/index';
 
-export class EnvironmentVariableResDto {
-  @ApiProperty()
-  @Expose()
-  id: string;
-
-  @ApiProperty()
-  @Expose()
-  key: string;
-
-  @ApiProperty()
-  @Expose()
-  value: string;
-}
 
 export class ListDeploymentTypeResDto {
   @ApiProperty()
@@ -89,14 +76,11 @@ export class DeploymentResDto {
   root_dir: string;
 
   @ApiProperty({
-    type: [EnvironmentVariableResDto]
+    type: Object
   })
   @Expose()
-  @Transform((value) => value.obj.environmentVariables ? plainToInstance(EnvironmentVariableResDto, value.obj.environmentVariables, {
-    enableImplicitConversion: true,
-    excludeExtraneousValues: true
-  }) : [])
-  environment_variables: EnvironmentVariableResDto[];
+  @Transform((value) => value.obj.environment_variables ?? null)
+  environment_variables: any;
 }
 
 
