@@ -1,7 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Validate } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { sanitizeEnvVariable } from '@common/utils/index';
+import { IsValidGitUrl } from '../../../../common/validators';
 
 export class EnvironmentVariableReqDto {
 
@@ -32,7 +33,8 @@ export class CreateDeploymentReqDto {
   @ApiProperty()
   @IsUrl()
   @IsNotEmpty()
-  repository_link: string;
+  @Validate(IsValidGitUrl)
+  repository_url: string;
 
   @ApiPropertyOptional()
   @IsString()

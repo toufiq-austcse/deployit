@@ -31,6 +31,13 @@ export function getServiceUrl(subDomainName: string): string {
   return `https://${subDomainName}.${AppConfigService.appConfig.DOMAIN_NAME}`;
 }
 
+export function parseRepoUrl(repoUrl: string): { repoName: string, repoOwner: string } {
+  return {
+    repoName: repoUrl.split('/').pop().replace('.git', ''),
+    repoOwner: repoUrl.split('/').slice(-2)[0]
+  };
+}
+
 export function sanitizeEnvVariable(obj: TransformFnParams): EnvironmentVariableReqDto[] {
   let variables = obj.value;
   let envObj: any = {};

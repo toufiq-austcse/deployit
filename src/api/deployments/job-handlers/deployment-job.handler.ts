@@ -74,7 +74,7 @@ export class DeploymentJobHandler {
   async pullRepository(deployment: Deployment) {
     Logger.log('Pulling Repository', DeploymentJobHandler.name);
     let cloneDir = this.getDeploymentLocalCloneDir(deployment);
-    let gitClone = spawn('git', ['clone', deployment.repository_link, cloneDir]);
+    let gitClone = spawn('git', ['clone', deployment.repository_url, cloneDir]);
     gitClone.stdout.on('data', (data) => {
       console.log(`stdout: ${data}`);
     });

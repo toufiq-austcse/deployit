@@ -52,14 +52,15 @@ export class Deployment extends AppBaseEntity {
   last_deployed_at: Date;
 
   @Column({
-    nullable: true
+    nullable: true,
+    type: 'text'
   })
   repository_full_name: string;
 
   @Column({
     type: 'text'
   })
-  repository_link: string;
+  repository_url: string;
 
   @Column({
     type: 'varchar'
