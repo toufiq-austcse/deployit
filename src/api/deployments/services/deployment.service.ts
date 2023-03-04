@@ -3,7 +3,7 @@ import { DeploymentTypeRepository } from '../repositories/deployment-type.reposi
 import { DEPLOYMENT_STATUS, DEPLOYMENT_TYPE_STATUS, JOB_NAME } from '@common/utils/constants';
 import { DeploymentResDto, ListDeploymentResDto, ListDeploymentTypeResDto } from '../dto/res/deployment-res.dto';
 import { plainToInstance } from 'class-transformer';
-import { CreateDeploymentReqDto, ListDeploymentQueryDto } from '../dto/req/deployment-req.dto';
+import { CreateDeploymentReqDto, CreateEnvReqDto, ListDeploymentQueryDto } from '../dto/req/deployment-req.dto';
 import { User } from '../../auth/entities/user.entity';
 import { DeepPartial, In } from 'typeorm';
 import { Deployment } from '../entities/deployment.entity';
@@ -158,5 +158,22 @@ export class DeploymentService {
         sub_domain_name: subDomainName
       }
     });
+  }
+
+  async updateEnvironmentVariables(id: number, dto: CreateEnvReqDto, user: User): Promise<Object> {
+    let deployment = await this.repository.findOne({
+      where: {
+        id: id,
+        user_id: user.id
+      }
+    });
+    if (!deployment) {
+      throw new NotFoundException('Deployment not found');
+    }
+    deployment.environment_variables = dto.environment_variables;
+    let updatedDeployment = await this.repository.save(deployment);
+
+    return updatedDeployment.environment_variables;
+
   }
 }

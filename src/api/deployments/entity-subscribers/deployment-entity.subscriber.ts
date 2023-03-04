@@ -65,8 +65,12 @@ export class DeploymentEntitySubscriber implements EntitySubscriberInterface<Dep
     return undefined;
   }
 
-  afterUpdate(event: UpdateEvent<Deployment>): Promise<any> | void {
-    return undefined;
+  afterUpdate(event: UpdateEvent<Deployment>):void {
+    let updatedColumns = event.updatedColumns.map((column) => column.propertyName);
+    if (updatedColumns.includes('environment_variables')) {
+      console.log('environment_variables updated');
+    }
+    return;
   }
 
   async beforeInsert(event: InsertEvent<Deployment>): Promise<void> {

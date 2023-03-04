@@ -69,12 +69,11 @@ export class ListDeploymentQueryDto {
 
 export class CreateEnvReqDto {
   @ApiProperty({
-    type: [EnvironmentVariableReqDto]
+    type: Object
   })
   @IsNotEmpty()
   @IsObject()
-  @Type(() => EnvironmentVariableReqDto)
-  environment_variables: EnvironmentVariableReqDto;
+  environment_variables: Object;
 
 
 }

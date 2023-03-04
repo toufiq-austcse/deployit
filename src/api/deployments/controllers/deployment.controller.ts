@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -16,7 +17,7 @@ import { DeploymentResDto, ListDeploymentResDto, ListDeploymentTypeResDto } from
 import { BaseApiResponse, SwaggerBaseApiResponse } from '@common/dto/base-api-response.dto';
 import { ResponseInterceptor } from '@common/interceptors/response.interceptor';
 import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
-import { CreateDeploymentReqDto, ListDeploymentQueryDto } from '../dto/req/deployment-req.dto';
+import { CreateDeploymentReqDto, CreateEnvReqDto, ListDeploymentQueryDto } from '../dto/req/deployment-req.dto';
 import { UserInfoDec } from '@common/decorators/user-info.decorator';
 import { User } from '../../auth/entities/user.entity';
 
@@ -78,17 +79,17 @@ export class DeploymentController {
   }
 
 
-  // @Post(':id/env')
-  // @UseGuards(JwtAuthGuard)
-  // @ApiSecurity('auth')
-  // @ApiCreatedResponse({ type: SwaggerBaseApiResponse([EnvironmentVariableResDto], HttpStatus.CREATED) })
-  // async createEnv(@Param('id', ParseIntPipe) id: number, @Body() dto: CreateEnvReqDto, @UserInfoDec() user: User): Promise<BaseApiResponse<EnvironmentVariableResDto[]>> {
-  //   let data = await this.envVariableService.createDeploymentEnvVariable(id, dto, user);
-  //   return {
-  //     message: '',
-  //     data
-  //   };
-  //
-  // }
+  @Patch(':id/environment-variables')
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('auth')
+  @ApiCreatedResponse({ type: SwaggerBaseApiResponse(Object, HttpStatus.CREATED) })
+  async createEnv(@Param('id', ParseIntPipe) id: number, @Body() dto: CreateEnvReqDto, @UserInfoDec() user: User): Promise<BaseApiResponse<Object>> {
+    let data = await this.deploymentService.updateEnvironmentVariables(id, dto, user);
+    return {
+      message: '',
+      data
+    };
+
+  }
 
 }
