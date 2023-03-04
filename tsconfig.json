@@ -66,6 +66,9 @@
       ],
       "@common/rabbit-mq/*": [
         "./src/common/rabbit-mq/*"
+      ],
+      "@common/validators/*": [
+        "./src/common/validators/*"
       ]
     }
   }

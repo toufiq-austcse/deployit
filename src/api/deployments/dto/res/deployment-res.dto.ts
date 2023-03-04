@@ -74,7 +74,11 @@ export class DeploymentResDto {
 
   @ApiProperty()
   @Expose()
-  repository_link: string;
+  repository_url: string;
+
+  @ApiProperty()
+  @Expose()
+  repository_full_name: string;
 
   @ApiProperty()
   @Expose()
@@ -88,10 +92,10 @@ export class DeploymentResDto {
     type: [EnvironmentVariableResDto]
   })
   @Expose()
-  @Transform((value) => plainToInstance(EnvironmentVariableResDto, value.obj.environmentVariables, {
+  @Transform((value) => value.obj.environmentVariables ? plainToInstance(EnvironmentVariableResDto, value.obj.environmentVariables, {
     enableImplicitConversion: true,
     excludeExtraneousValues: true
-  }))
+  }) : [])
   environment_variables: EnvironmentVariableResDto[];
 }
 

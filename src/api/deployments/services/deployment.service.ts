@@ -11,15 +11,18 @@ import { DeploymentRepository } from '../repositories/deployment.repository';
 import { DeploymentType } from '../entities/deployment-type.entity';
 import { GetDeploymentsFilterDto } from '../dto/db-query/get-deployments-filter.dto';
 import { DeploymentJobDto } from '../dto/job';
-import { RabbitMqService } from '@common/rabbit-mq/service/rabbitmq.service';
+
 import { AppConfigService } from '@common/app-config/service/app-config.service';
 import { EnvironmentVariable } from '../entities/environment-variable.entity';
 import dataSource from '../../../../ormconfig';
+import { GithubService } from '@common/http-clients/github/services/github.service';
+import { RabbitMqService } from '@common/rabbit-mq/service/rabbitmq.service';
 
 @Injectable()
 export class DeploymentService {
   constructor(private deploymentTypesRepository: DeploymentTypeRepository,
               private repository: DeploymentRepository,
+              private githubService: GithubService,
               private rabbitMqService: RabbitMqService) {
   }
 
@@ -58,15 +61,16 @@ export class DeploymentService {
 
   }
 
-  createDeploymentObjFromCreateReqDto(dto: CreateDeploymentReqDto, deploymentType: DeploymentType, user: User): DeepPartial<Deployment> {
+  createDeploymentObjFromCreateReqDto(dto: CreateDeploymentReqDto, fullName: string, deploymentType: DeploymentType, user: User): DeepPartial<Deployment> {
     return {
       name: dto.name,
       deployment_type_id: deploymentType.id,
       root_dir: dto.root_dir,
       status: DEPLOYMENT_STATUS.QUEUED,
-      repository_link: dto.repository_link,
+      repository_url: dto.repository_url,
       branch_name: dto.branch_name,
-      user_id: user.id
+      user_id: user.id,
+      repository_full_name: fullName
     };
   }
 
@@ -87,7 +91,11 @@ export class DeploymentService {
     if (oldDeployment) {
       throw new BadRequestException('Deployment with this name already exists');
     }
-    let newDeploymentObj = this.createDeploymentObjFromCreateReqDto(dto, deploymentType, user);
+    let { isValid, repository } = await this.githubService.getRepository(dto.repository_url);
+    if (!isValid) {
+      throw new BadRequestException('Invalid repository url');
+    }
+    let newDeploymentObj = this.createDeploymentObjFromCreateReqDto(dto, repository.full_name, deploymentType, user);
     let {
       deployment,
       environmentVariables

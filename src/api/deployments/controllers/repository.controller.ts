@@ -5,6 +5,7 @@ import { BaseApiResponse, SwaggerBaseApiResponse } from '@common/dto/base-api-re
 import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
 import { ValidateRepositoryResDto } from '../dto/res/repository-res.dto';
 import { ResponseInterceptor } from '@common/interceptors/response.interceptor';
+import { ValidateRepositoryQueryDto } from '../dto/req/repository-req.dto';
 
 @ApiTags('Repository')
 @Controller({ path: 'repositories', version: '1' })
@@ -18,8 +19,8 @@ export class RepositoryController {
   @ApiOkResponse({ type: SwaggerBaseApiResponse(ValidateRepositoryResDto, HttpStatus.OK) })
   @UseGuards(JwtAuthGuard)
   @ApiSecurity('auth')
-  async validateRepository(@Query('repo_url') repoUrl: string): Promise<BaseApiResponse<ValidateRepositoryResDto>> {
-    let data = await this.repositoryService.validateRepository(repoUrl);
+  async validateRepository(@Query() dto: ValidateRepositoryQueryDto): Promise<BaseApiResponse<ValidateRepositoryResDto>> {
+    let data = await this.repositoryService.validateRepository(dto.repository_url);
     return {
       message: null,
       data
