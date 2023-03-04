@@ -4,32 +4,28 @@ import {
   Get,
   HttpStatus,
   Param,
-  ParseIntPipe, Patch,
-  Post, Query,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
   UseGuards,
   UseInterceptors
 } from '@nestjs/common';
 import { DeploymentService } from '../services/deployment.service';
 import { ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import {
-  DeploymentResDto,
-  EnvironmentVariableResDto,
-  ListDeploymentResDto,
-  ListDeploymentTypeResDto
-} from '../dto/res/deployment-res.dto';
+import { DeploymentResDto, ListDeploymentResDto, ListDeploymentTypeResDto } from '../dto/res/deployment-res.dto';
 import { BaseApiResponse, SwaggerBaseApiResponse } from '@common/dto/base-api-response.dto';
 import { ResponseInterceptor } from '@common/interceptors/response.interceptor';
 import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
 import { CreateDeploymentReqDto, CreateEnvReqDto, ListDeploymentQueryDto } from '../dto/req/deployment-req.dto';
 import { UserInfoDec } from '@common/decorators/user-info.decorator';
 import { User } from '../../auth/entities/user.entity';
-import { EnvironmentVariableService } from '../services/env-variable.service';
 
 @Controller({ path: 'deployments', version: '1' })
 @ApiTags('Deployment')
 @UseInterceptors(ResponseInterceptor)
 export class DeploymentController {
-  constructor(private deploymentService: DeploymentService, private envVariableService: EnvironmentVariableService) {
+  constructor(private deploymentService: DeploymentService) {
 
   }
 
@@ -83,37 +79,12 @@ export class DeploymentController {
   }
 
 
-  @Post(':id/env')
+  @Patch(':id/environment-variables')
   @UseGuards(JwtAuthGuard)
   @ApiSecurity('auth')
-  @ApiCreatedResponse({ type: SwaggerBaseApiResponse([EnvironmentVariableResDto], HttpStatus.CREATED) })
-  async createEnv(@Param('id', ParseIntPipe) id: number, @Body() dto: CreateEnvReqDto, @UserInfoDec() user: User): Promise<BaseApiResponse<EnvironmentVariableResDto[]>> {
-    let data = await this.envVariableService.createDeploymentEnvVariable(id, dto, user);
-    return {
-      message: '',
-      data
-    };
-
-  }
-
-  @Get(':id/env')
-  @UseGuards(JwtAuthGuard)
-  @ApiSecurity('auth')
-  @ApiOkResponse({ type: SwaggerBaseApiResponse([EnvironmentVariableResDto], HttpStatus.OK) })
-  async listEnv(@Param('id', ParseIntPipe) id: number, @UserInfoDec() user: User): Promise<BaseApiResponse<EnvironmentVariableResDto[]>> {
-    let data = await this.envVariableService.listDeploymentEnvVariable(id, user);
-    return {
-      message: '',
-      data
-    };
-  }
-
-  @Patch(':id/env')
-  @UseGuards(JwtAuthGuard)
-  @ApiSecurity('auth')
-  @ApiOkResponse({ type: SwaggerBaseApiResponse([EnvironmentVariableResDto], HttpStatus.OK) })
-  async updateEnv(@Param('id', ParseIntPipe) id: number, @Body() dto: CreateEnvReqDto, @UserInfoDec() user: User): Promise<BaseApiResponse<EnvironmentVariableResDto[]>> {
-    let data = await this.envVariableService.updateDeploymentEnvVariable(id, dto, user);
+  @ApiCreatedResponse({ type: SwaggerBaseApiResponse(Object, HttpStatus.CREATED) })
+  async createEnv(@Param('id', ParseIntPipe) id: number, @Body() dto: CreateEnvReqDto, @UserInfoDec() user: User): Promise<BaseApiResponse<Object>> {
+    let data = await this.deploymentService.updateEnvironmentVariables(id, dto, user);
     return {
       message: '',
       data

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { EnvironmentVariable } from '../entities/environment-variable.entity';
 import { terminal } from '@common/utils/terminal';
 
 @Injectable()
@@ -7,13 +6,13 @@ export class DockerService {
   private PORT = 4000;
 
 
-  getEnvVariablesCommandString(envVariables: EnvironmentVariable[]): string {
+  getEnvVariablesCommandString(envVariables: Record<string, string>): string {
     let command = ` -e PORT=${this.PORT}`;
-    for (let envVariable of envVariables) {
-      if (envVariable.key === 'PORT') {
+    for (let key of Object.keys(envVariables)) {
+      if (key.toLowerCase() === 'port') {
         continue;
       }
-      command += ` -e ${envVariable.key}=${envVariable.value}`;
+      command += ` -e ${key}=${envVariables[key]}`;
     }
     return command;
   }

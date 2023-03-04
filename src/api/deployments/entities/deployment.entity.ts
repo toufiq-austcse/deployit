@@ -88,4 +88,9 @@ export class Deployment extends AppBaseEntity {
   @Column()
   user_id: number;
 
+  @Column({
+    type: 'json',
+    nullable: true
+  })
+  environment_variables: any;
 }

@@ -12,14 +12,12 @@ import { RabbitMqService } from '@common/rabbit-mq/service/rabbitmq.service';
 import { Deployment } from '../entities/deployment.entity';
 import { DeploymentService } from '../services/deployment.service';
 import { terminal } from '@common/utils/terminal';
-import { EnvironmentVariableService } from '../services/env-variable.service';
 import { DockerService } from '../services/docker.service';
 
 @Injectable()
 export class DeploymentJobHandler {
   constructor(private deploymentRepository: DeploymentRepository,
               private deploymentService: DeploymentService,
-              private environmentVariableService: EnvironmentVariableService,
               private rabbitMqService: RabbitMqService,
               private dockerService: DockerService) {
   }
@@ -141,9 +139,7 @@ export class DeploymentJobHandler {
   private async runDockerContainer(deployment: Deployment) {
     Logger.log('Running docker container', DeploymentJobHandler.name);
     try {
-
-      let envVariables = await this.environmentVariableService.getEnvVariables(deployment.id);
-      let envVariableCommandString = this.dockerService.getEnvVariablesCommandString(envVariables);
+      let envVariableCommandString = this.dockerService.getEnvVariablesCommandString(deployment.environment_variables);
       let containerRunCommand = this.dockerService.getContainerRunCommandString(deployment.docker_img_tag, envVariableCommandString);
       let containerId = await terminal(containerRunCommand);
       let mappedPort = await this.dockerService.getMappedPort(containerId);

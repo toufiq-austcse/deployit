@@ -1,8 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Validate } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
-import { sanitizeEnvVariable } from '@common/utils/index';
-import { IsValidGitUrl } from '../../../../common/validators';
+import { IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, IsUrl, Validate } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsValidGitUrl } from '@common/validators/index';
 
 export class EnvironmentVariableReqDto {
 
@@ -46,11 +45,10 @@ export class CreateDeploymentReqDto {
   @IsOptional()
   root_dir: string = null;
 
-  @ApiPropertyOptional({ type: [EnvironmentVariableReqDto] })
-  @IsArray()
+  @ApiPropertyOptional({ type: Object })
+  @IsObject()
   @IsOptional()
-  @Transform(obj => sanitizeEnvVariable(obj))
-  environment_variables: EnvironmentVariableReqDto[] = [];
+  environment_variables: any = null;
 }
 
 export class ListDeploymentQueryDto {
@@ -71,13 +69,11 @@ export class ListDeploymentQueryDto {
 
 export class CreateEnvReqDto {
   @ApiProperty({
-    type: [EnvironmentVariableReqDto]
+    type: Object
   })
   @IsNotEmpty()
-  @IsArray()
-  @Type(() => EnvironmentVariableReqDto)
-  @Transform(obj => sanitizeEnvVariable(obj))
-  environment_variables: EnvironmentVariableReqDto[];
+  @IsObject()
+  environment_variables: Object;
 
 
 }
