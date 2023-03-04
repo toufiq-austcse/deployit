@@ -20,3 +20,5 @@ export const JOB_NAME = {
   COMPLETE_DEPLOYMENT: 'complete_deployment',
   RESTART_DOCKER_CONTAINER: 'restart_docker_container'
 };
+
+export const DEFAULT_BRANCH_NAME = 'master';
