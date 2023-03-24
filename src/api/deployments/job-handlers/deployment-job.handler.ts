@@ -69,6 +69,14 @@ export class DeploymentJobHandler {
     return `${AppConfigService.appConfig.REPOSITORIES_LOCAL_DIR_PATH}/${deployment.short_id}`;
   }
 
+  getDockerFileDir(deployment: Deployment): string {
+    let dir = this.getDeploymentLocalCloneDir(deployment);
+    if (deployment.root_dir) {
+      dir = `${dir}/${deployment.root_dir}`;
+    }
+    return dir;
+  }
+
   async pullRepository(deployment: Deployment) {
     Logger.log('Pulling Repository', DeploymentJobHandler.name);
     let cloneDir = this.getDeploymentLocalCloneDir(deployment);
@@ -100,9 +108,9 @@ export class DeploymentJobHandler {
 
   async buildDockerImg(deployment: Deployment) {
     Logger.log('Building docker img', DeploymentJobHandler.name);
-    let deploymentLocalDir = this.getDeploymentLocalCloneDir(deployment);
+    let dockerFileDir = this.getDockerFileDir(deployment);
     let imgTag = this.deploymentService.getDockerImgTag(deployment);
-    let dockerImgBuild = spawn('docker', ['build', deploymentLocalDir, '-t', imgTag]);
+    let dockerImgBuild = spawn('docker', ['build', dockerFileDir, '-t', imgTag]);
     dockerImgBuild.stdout.on('data', (data) => {
       console.log(`stdout: ${data}`);
     });

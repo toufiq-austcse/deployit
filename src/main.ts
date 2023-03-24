@@ -1,3 +1,4 @@
+require('dotenv').config();
 import { NestFactory } from '@nestjs/core';
 import { ApiModule } from './api/api.module';
 import { Logger, RequestMethod, ValidationPipe, VersioningType } from '@nestjs/common';
