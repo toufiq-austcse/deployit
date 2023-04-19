@@ -21,12 +21,32 @@ export class SignUpReqDto {
 
 export class LoginReqDto {
   @ApiProperty()
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, {
+    message: JSON.stringify({
+      key: 'email',
+      message: 'Invalid email address'
+    })
+  })
+  @IsNotEmpty({
+    message: JSON.stringify({
+      key: 'email',
+      message: 'email is required'
+    })
+  })
   email: string;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
+  @IsString({
+    message: JSON.stringify({
+      key: 'password',
+      message: 'password must be a string'
+    })
+  })
+  @IsNotEmpty({
+    message: JSON.stringify({
+      key: 'password',
+      message: 'password is required'
+    })
+  })
   password: string;
 }
