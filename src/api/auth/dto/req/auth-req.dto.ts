@@ -3,19 +3,49 @@ import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-vali
 
 export class SignUpReqDto {
   @ApiProperty()
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, {
+    message: JSON.stringify({
+      key: 'email',
+      message: 'invalid email address'
+    })
+  })
+  @IsNotEmpty({
+    message: JSON.stringify({
+      key: 'email',
+      message: 'email is required'
+    })
+  })
   email: string;
 
   @ApiPropertyOptional()
-  @IsString()
+  @IsString({
+    message: JSON.stringify({
+      key: 'name',
+      message: 'name must be a string'
+    })
+  })
   @IsOptional()
   name: string;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(5)
+  @IsString({
+    message: JSON.stringify({
+      key: 'password',
+      message: 'password must be a string'
+    })
+  })
+  @IsNotEmpty({
+    message: JSON.stringify({
+      key: 'password',
+      message: 'password is required'
+    })
+  })
+  @MinLength(5, {
+    message: JSON.stringify({
+      key: 'password',
+      message: 'password must be at least 5 characters'
+    })
+  })
   password: string;
 }
 
