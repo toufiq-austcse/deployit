@@ -37,7 +37,10 @@ export class AuthService {
   async signUp(dto: SignUpReqDto): Promise<SignUpResDto> {
     let currentUser = await this.repository.findOne({ where: { email: dto.email } });
     if (currentUser) {
-      throw new BadRequestException('Email already exists');
+      throw new BadRequestException(JSON.stringify({
+        key: 'email',
+        message: 'Email already exists'
+      }));
     }
     let newUserObj = await this.createUserObjFromSignUpReqDto(dto);
     let user = await this.createUser(newUserObj);
