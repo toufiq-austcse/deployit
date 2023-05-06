@@ -39,7 +39,7 @@ export class AuthService {
     if (currentUser) {
       throw new BadRequestException(JSON.stringify({
         key: 'email',
-        message: 'email already exists'
+        message: 'email already registered'
       }));
     }
     let newUserObj = await this.createUserObjFromSignUpReqDto(dto);
