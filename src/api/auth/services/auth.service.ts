@@ -55,7 +55,10 @@ export class AuthService {
   async login(dto: LoginReqDto): Promise<LoginResDto> {
     let user = await this.repository.findOne({ where: { email: dto.email } });
     if (!user) {
-      throw new NotFoundException('user not found');
+      throw new UnauthorizedException(JSON.stringify({
+        key: 'email',
+        message: 'email is incorrect'
+      }));
     }
     let isPasswordMatched = await checkPassword(user.password, dto.password);
     if (!isPasswordMatched) {
