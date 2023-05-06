@@ -53,7 +53,10 @@ export class DeploymentService {
   async createDeployment(dto: CreateDeploymentReqDto, user: User): Promise<DeploymentResDto> {
     let deploymentType = await this.deploymentTypesRepository.findOne({ where: { id: dto.deployment_type_id } });
     if (!deploymentType) {
-      throw new BadRequestException('Invalid deployment type');
+      throw new BadRequestException({
+        key: 'deployment_type_id',
+        message: 'Invalid deployment type id'
+      });
     }
     if (deploymentType.status === DEPLOYMENT_TYPE_STATUS.DISABLED) {
       throw new NotAcceptableException('This deployment type is currently disabled');
@@ -65,11 +68,17 @@ export class DeploymentService {
       }
     });
     if (oldDeployment) {
-      throw new BadRequestException('Deployment with this name already exists');
+      throw new BadRequestException(JSON.stringify({
+        key: 'name',
+        message: 'Deployment name already exists'
+      }));
     }
     let { isValid, repository } = await this.githubService.getRepository(dto.repository_url);
     if (!isValid) {
-      throw new BadRequestException('Invalid repository url');
+      throw new BadRequestException(JSON.stringify({
+        key: 'repository_url',
+        message: 'Invalid repository url'
+      }));
     }
     let newDeploymentObj = this.createDeploymentObjFromCreateReqDto(dto, repository.full_name, deploymentType, user);
     let deployment = await this.insertNewDeployment(newDeploymentObj);

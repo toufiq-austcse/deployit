@@ -7,9 +7,6 @@ export class BaseApiResponse<T> {
   @ApiProperty()
   public message: string;
 
-  @ApiProperty()
-  public errors?: string[];
-
   public data: T; // Swagger Decorator is added in the extended class below, since that will override this one.
 }
 
@@ -63,9 +60,6 @@ export class BaseApiErrorResponse {
 
   @ApiProperty()
   public message: string;
-
-  @ApiProperty()
-  public errors: string[];
 
   @ApiProperty({ default: null })
   public data: any;

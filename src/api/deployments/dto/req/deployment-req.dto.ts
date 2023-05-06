@@ -20,33 +20,78 @@ export class CreateDeploymentReqDto {
 
   @ApiProperty()
   @Type(() => Number)
-  @IsNumber()
-  @IsNotEmpty()
+  @IsNumber({}, {
+    message: JSON.stringify({
+      key: 'deployment_type_id',
+      message: 'deployment_type_id should be a number'
+    })
+  })
+  @IsNotEmpty({
+    message: JSON.stringify({
+      key: 'deployment_type_id',
+      message: 'deployment_type_id is required'
+    })
+  })
   deployment_type_id: number;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
+  @IsString({
+    message: JSON.stringify({
+      key: 'name',
+      message: 'name must be a string'
+    })
+  })
+  @IsNotEmpty({
+    message: JSON.stringify({
+      key: 'name',
+      message: 'name is required'
+    })
+  })
   name: string;
 
   @ApiProperty()
-  @IsUrl()
-  @IsNotEmpty()
+  @IsUrl({}, {
+    message: JSON.stringify({
+      key: 'repository_url',
+      message: 'repository_url should be a valid url'
+    })
+  })
+  @IsNotEmpty({
+    message: JSON.stringify({
+      key: 'repository_url',
+      message: 'repository_url is required'
+    })
+  })
   @Validate(IsValidGitUrl)
   repository_url: string;
 
   @ApiPropertyOptional()
-  @IsString()
+  @IsString({
+    message: JSON.stringify({
+      key: 'branch_name',
+      message: 'branch_name must be a string'
+    })
+  })
   @IsOptional()
   branch_name: string = 'master';
 
   @ApiPropertyOptional()
-  @IsString()
+  @IsString({
+    message: JSON.stringify({
+      key: 'root_dir',
+      message: 'root_dir must be a string'
+    })
+  })
   @IsOptional()
   root_dir: string = null;
 
   @ApiPropertyOptional({ type: Object })
-  @IsObject()
+  @IsObject({
+    message: JSON.stringify({
+      key: 'environment_variables',
+      message: 'environment_variables must be an object'
+    })
+  })
   @IsOptional()
   environment_variables: any = null;
 }
