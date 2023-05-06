@@ -8,6 +8,9 @@ export class IsValidGitUrl implements ValidatorConstraintInterface {
   }
 
   defaultMessage() {
-    return 'invalid git url';
+    return JSON.stringify({
+      key: 'repository_url',
+      message: 'repository_url should be a valid git url'
+    });
   }
 }
