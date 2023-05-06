@@ -59,7 +59,10 @@ export class AuthService {
     }
     let isPasswordMatched = await checkPassword(user.password, dto.password);
     if (!isPasswordMatched) {
-      throw new UnauthorizedException('Wrong password');
+      throw new UnauthorizedException(JSON.stringify({
+        key: 'password',
+        message: 'password is incorrect'
+      }));
     }
     let accessTokenPayload = this.getAccessTokenPayload(user);
     let token = await this.jwtService.signAsync(accessTokenPayload);
