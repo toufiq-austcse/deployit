@@ -55,7 +55,7 @@ export class DeploymentService {
     if (!deploymentType) {
       throw new BadRequestException({
         key: 'deployment_type_id',
-        message: 'Invalid deployment type id'
+        message: 'Invalid deployment type'
       });
     }
     if (deploymentType.status === DEPLOYMENT_TYPE_STATUS.DISABLED) {
