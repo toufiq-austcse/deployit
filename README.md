@@ -7,14 +7,73 @@ A simple Render (https://render.com/) type service where users can deploy their 
 - PostgreSQL : As data storage
 - RabbitMQ : To process task async
 - Docker : To build and run the deployment images
+- FE: VueJs, Bootstrap
 
+FE Repo URL : https://github.com/toufiq-austcse/deployit-frontend 
 ## Screenshots
 Some screenshots of the application.
-![Index Page]()
-*Index page*
+![Login Page](https://raw.githubusercontent.com/toufiq-austcse/deployit/master/screenshots/login.png)
+*Login page*
+![Signup Page](https://raw.githubusercontent.com/toufiq-austcse/deployit/master/screenshots/signup.png)
+*Signup page*
+![Profile Page](https://raw.githubusercontent.com/toufiq-austcse/deployit/master/screenshots/profile.png)
+*Profile page*
+![Create Deployment Part-1](https://raw.githubusercontent.com/toufiq-austcse/deployit/master/screenshots/check_repo.png)
+*Create Deployment Part-1*
+![Create Deployment Part-2](https://raw.githubusercontent.com/toufiq-austcse/deployit/master/screenshots/create.png)
+*Create Deployment Part-2*
+![Home](https://raw.githubusercontent.com/toufiq-austcse/deployit/master/screenshots/home.png)
+*Home Page*
+![Details Page](https://raw.githubusercontent.com/toufiq-austcse/deployit/master/screenshots/details.png)
+*Details Page*
+![URL](https://raw.githubusercontent.com/toufiq-austcse/deployit/master/screenshots/url.png)
+*URL*
 ## Run Locally
 
 In progress...
+
+## Database Schema
+```
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
+    updatedAt TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE deployment_types (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    status VARCHAR(255) NOT NULL,
+    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
+    updatedAt TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+
+CREATE TABLE deployments
+(
+    "createdAt"           TIMESTAMP DEFAULT NOW() NOT NULL,
+    "updatedAt"           TIMESTAMP DEFAULT NOW() NOT NULL,
+    id                    PRIMARY KEY,
+    short_id              VARCHAR(255) NOT NULL UNIQUE,
+    deployment_type_id    INTEGER                 NOT NULL,
+    name                  VARCHAR(255)            NOT NULL,
+    sub_domain_name       VARCHAR(255)            NOT NULL,
+    mapped_port           VARCHAR(255),
+    status                VARCHAR(255)            NOT NULL,
+    last_deployed_at      TIMESTAMP,
+    repository_url        TEXT                    NOT NULL,
+    branch_name           VARCHAR(255)            NOT NULL,
+    root_dir              VARCHAR(255),
+    docker_img_tag        VARCHAR(255),
+    container_id          VARCHAR(255),
+    user_id               INTEGER                 NOT NULL,
+    repository_full_name  TEXT,
+    environment_variables JSON
+);
+```
 
 
 ## API Reference
