@@ -10,7 +10,7 @@ A simple Render (https://render.com/) type service where users can deploy their 
 
 ## Screenshots
 Some screenshots of the application.
-![Index Page](https://i.imgur.com/WQYpktP.png)
+![Index Page]()
 *Index page*
 ## Run Locally
 
