@@ -17,7 +17,7 @@ In progress...
 #### SignUp
 
 ```http
-  POST /api/v1/auth/signup
+POST /api/v1/auth/signup
 ```
 
 ```
@@ -50,7 +50,7 @@ Response `201`
 #### Login
 
 ```http
-  POST /api/v1/auth/login
+POST /api/v1/auth/login
 ```
 
 ```
@@ -147,12 +147,7 @@ Req Body
   "repository_link": "string",
   "branch_name": "string",
   "root_dir": "string",
-  "environment_variables": [
-    {
-      "key": "string",
-      "value": "string"
-    }
-  ]
+  "environment_variables": {}
 }
 ```
 Response 201
@@ -174,13 +169,7 @@ Response 201
     "repository_link": "string",
     "branch_name": "string",
     "root_dir": "string",
-    "environment_variables": [
-      {
-        "id": "string",
-        "key": "string",
-        "value": "string"
-      }
-    ]
+    "environment_variables": {}
   }
 }
 ```
@@ -214,13 +203,102 @@ Response 200
     "repository_link": "string",
     "branch_name": "string",
     "root_dir": "string",
-    "environment_variables": [
+    "environment_variables": {}
+  }
+}
+```
+
+#### List Deployments
+```http
+GET /api/v1/deployments/{id}?page={page}&limit={limit}
+```
+Header
+```
+{
+    Authorization: {access_token}
+}
+```
+Response 200
+```
+{
+  "status": 200,
+  "message": "string",
+  "data": {
+    "deployments": [
       {
         "id": "string",
-        "key": "string",
-        "value": "string"
+        "deployment_type": {
+          "id": "string",
+          "name": "string"
+        },
+        "name": "string",
+        "sub_domain_name": "string",
+        "service_url": "string",
+        "status": "string",
+        "last_deployed_at": "string",
+        "repository_url": "string",
+        "repository_full_name": "string",
+        "branch_name": "string",
+        "root_dir": "string",
+        "environment_variables": {}
       }
-    ]
-  }
+    ],
+    "pagination_meta": {
+      "itemCount": 0,
+      "totalItems": 0,
+      "itemsPerPage": 0,
+      "totalPages": 0,
+      "currentPage": 0
+    }
+  },
+  "errors": []
+}
+```
+
+#### Update Environment Variables
+```http
+GET /api/v1/deployments/{id}/environment-variables
+```
+Header
+```
+{
+    Authorization: {access_token}
+}
+```
+BODY
+```
+{
+  "environment_variables": {}
+}
+```
+Response 201
+```
+{
+  "status": 201,
+  "message": "string",
+  "errors": [],
+  "data": {}
+}
+```
+
+#### Validate Github Repository
+```http
+GET /api/v1/repositories/validate?repository_url={repository_url}
+```
+Header
+```
+{
+    Authorization: {access_token}
+}
+```
+Response 200
+```
+{
+  "status": 200,
+  "message": "string",
+  "data": {
+    "repo_full_name": "string"
+  },
+  "errors": []
 }
 ```
