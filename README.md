@@ -7,6 +7,11 @@ A simple Render (https://render.com/) type service where users can deploy their 
 - PostgreSQL : As data storage
 - RabbitMQ : To process task async
 - Docker : To build and run the deployment images
+
+## Screenshots
+Some screenshots of the application.
+![Index Page](https://i.imgur.com/WQYpktP.png)
+*Index page*
 ## Run Locally
 
 In progress...
